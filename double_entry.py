@@ -19,10 +19,17 @@ class Entry:
     side: Side
     amount: Decimal
 
+    def __repr__(self) -> str:
+        side_str = "Dr" if self.side == Side.DEBIT else "Cr"
+        return f"{side_str} {self.account_name} {self.amount}"
+
 @dataclass
 class Transaction:
     description: str
     entries: list[Entry]
+
+    def __repr__(self) -> str:
+        return f"{self.description} {self.entries}"
 
 @dataclass
 class Account:
@@ -101,6 +108,10 @@ class Ledger:
             self.accounts[entry.account_name].post(entry.side, entry.amount)
 
         self.journal.append(tx)
+    
+    def display_journal(self):
+        for idx, tx in enumerate(self.journal):
+            print(f"{idx + 1}. {tx}")
 
 def main():
     ledger = Ledger()
@@ -135,6 +146,8 @@ def main():
 
     assert ledger.get_account("Cash").balance() == 200
     assert ledger.get_account("Loan Payable").balance() == 1200
+
+    ledger.display_journal()
 
     print("all tests passed!")
 
