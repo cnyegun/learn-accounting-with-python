@@ -101,3 +101,42 @@ class Ledger:
             self.accounts[entry.account_name].post(entry.side, entry.amount)
 
         self.journal.append(tx)
+
+def main():
+    ledger = Ledger()
+    ledger.add_account(name="Cash", account_type=AccountType.ASSET)
+    ledger.add_account(name="Equipment", account_type=AccountType.ASSET)
+    ledger.add_account(name="Rent Expense", account_type=AccountType.EXPENSE)
+    ledger.add_account(name="Owner Equity", account_type=AccountType.EQUITY)
+    ledger.add_account(name="Revenue", account_type=AccountType.REVENUE)
+    ledger.add_account(name="Loan Payable", account_type=AccountType.LIABILITY)
+
+    assert ledger.journal == []
+
+    ledger.post_transaction(
+        Transaction(
+            description="Bought 1000$ worth of machines", 
+            entries=[
+                Entry("Cash", Side.CREDIT, Decimal("1000")), 
+                Entry("Equipment", Side.DEBIT, Decimal("1000"))
+            ]
+        )
+    )
+    
+    ledger.post_transaction(
+        Transaction(
+            description="Borrow 1200$ from the bank", 
+            entries=[
+                Entry("Cash", Side.DEBIT, Decimal("1200")), 
+                Entry("Loan Payable", Side.CREDIT, Decimal("1200"))
+            ]
+        )
+    )
+
+    assert ledger.get_account("Cash").balance() == 200
+    assert ledger.get_account("Loan Payable").balance() == 1200
+
+    print("all tests passed!")
+
+if __name__ == "__main__":
+    main()
